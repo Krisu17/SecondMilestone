@@ -16,6 +16,7 @@
     <ul>
         <li><a href="/">Strona główna</a></li>
         <li><a href="/register">Zarejestuj się</a></li>
+        <li><a href="/login">Zaloguj</a></li>
         <li><a href="/contact">Kontakt</a></li>
     </ul>
 </nav>
@@ -24,23 +25,48 @@
     <h2>Zarejestruj się</h2>
 
     <form id="registration-form" class="registration-form">
+
         <div class="form-row">
-            <label for="login" class="required">Login</label>
+            <label for="name" class="required">Imię</label><br>
+            <input id="name" type="text" name="name" class="input-field" placeholder="Jan"/>
+        </div>
+
+        <div class="form-row">
+            <label for="surname" class="required">Nazwisko</label><br>
+            <input id="surname" type="text" name="surname" class="input-field" placeholder="Kowalski"/>
+        </div>
+
+        <div class="form-row">
+            <label for="birthDate" class="required">Data urodzenia</label><br>
+            <input id="birthDate" type="date" name="birthDate" class="input-field"/>
+        </div>
+        
+        <div class="form-row">
+            <label for="adress" class="required">Adres zamieszkania</label><br>
+            <input id="street" type="text" name="street" class="input-field" placeholder="Ulica"/><br>
+            <input id="adressNumber" type="text" name="adressNumber" class="input-field" placeholder="Nr mieszkania"/><br>
+            <input id="postalCode" type="text" name="postalCode" class="input-field" placeholder="Kod pocztowy"/><br>
+            <input id="country" type="text" name="country" class="input-field" placeholder="Kraj"/>
+        </div>
+
+
+        <div class="form-row">
+            <label for="login" class="required">Login</label><br>
             <input id="login" type="text" name="login" class="input-field" placeholder="Pawel"/>
         </div>
 
         <div class="form-row">
-            <label for="pesel" class="required">PESEL</label>
+            <label for="pesel" class="required">PESEL</label><br>
             <input id="pesel" type="text" name="pesel" class="input-field" placeholder="97101492672"/>
         </div>
 
         <div class="form-row">
-            <label for="password" class="required">Hasło</label>
+            <label for="password" class="required">Hasło</label><br>
             <input id="password" type="password" name="password" class="input-field" placeholder="Hasło"/>
         </div>
 
         <div class="form-row">
-            <label for="second_password" class="required">Powtórz hasło</label>
+            <label for="second_password" class="required">Powtórz hasło</label><br>
             <input id="second_password" type="password" name="second_password" class="input-field" placeholder="Powrórz hasło"/>
         </div>
 

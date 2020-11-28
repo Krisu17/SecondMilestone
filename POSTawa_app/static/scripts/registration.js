@@ -2,13 +2,13 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
     const GET = "GET";
     const POST = "POST";
-    const URL = "https://pamiw2020registration.herokuapp.com/";
+    const URL = "https://localhost:8081/";
 
     const LOGIN_FIELD_ID = "login";
     const PESEL_FIELD_ID = "pesel";
     const PASSWORD_FIELD_ID = "password";
     const REPEAT_PASSWORD_FIELD_ID = "second_password";
-    const SUBMIT_BUTTON_ID = "button-reg-form"
+    const SUBMIT_BUTTON_ID = "button-reg-form";
 
     var HTTP_STATUS = {OK: 200, CREATED: 201, NOT_FOUND: 404};
 
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
     function checkLoginAvailability() {
         let loginInput = document.getElementById(LOGIN_FIELD_ID);
-        let baseUrl = URL + "user/";
+        let baseUrl = URL + "register/";
         let userUrl = baseUrl + loginInput.value;
 
         return Promise.resolve(fetch(userUrl, {method: GET}).then(function (resp) {
@@ -154,7 +154,8 @@ document.addEventListener('DOMContentLoaded', function (event) {
     }
 
     function submitRegisterForm() {
-        let registerUrl = URL + "register";
+        let login = document.getElementById(LOGIN_FIELD_ID).value
+        let registerUrl = URL + "register/create_new_user/" + login;
 
         let registerParams = {
             method: POST,
@@ -170,11 +171,11 @@ document.addEventListener('DOMContentLoaded', function (event) {
             });
     }
 
-    function getRegisterResponseData(response) {
+    function getRegisterResponseData(response) {  // to remove
         let status = response.status;
 
         if (status === HTTP_STATUS.OK || status === HTTP_STATUS.CREATED) {
-            return response.json();
+            return response;
         } else {
             console.error("Response status code: " + response.status);
             throw "Unexpected response status: " + response.status;
@@ -182,13 +183,14 @@ document.addEventListener('DOMContentLoaded', function (event) {
     }
 
     function displayInConsoleCorrectResponse(correctResponse) {
-        let status = correctResponse.registration_status;
+        let status = correctResponse.status;
+        console.log("status " + status)
         let correctRegisterInfo = "correctRegister";
         let sucessMessage = "Użytkownik został zarejestrowany pomyślnie.";
         let warningRegisterInfo = "correctRegister";
         let warningMessage = "Podczas rejstracji wystąpił błąd.";
 
-        if (status !== "OK") {
+        if (status !== HTTP_STATUS.CREATED) {
             removeWarningMessage(correctRegisterInfo);
             showWarningMessage(warningRegisterInfo, warningMessage, SUBMIT_BUTTON_ID);
             console.log("Errors: " + correctResponse.errors);
