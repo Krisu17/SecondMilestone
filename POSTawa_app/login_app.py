@@ -23,6 +23,8 @@ db = redis.Redis(host="redis", port=6379, decode_responses=True)
 
 app.config["JWT_SECRET_KEY"] = os.environ.get(SECRET_KEY)
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = TOKEN_EXPIRES_IN_SECONDS
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_COOKIE_SECURE"] = True
 
 
 jwt = JWTManager(app)

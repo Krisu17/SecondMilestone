@@ -52,7 +52,7 @@ class Person:
         self.__name = name
         self.__surname = surname
         self.__address = address
-        self.__phone = phone
+        self.__phone = phone_number
 
     def get_name(self):
         return self.__name
@@ -70,7 +70,7 @@ class Person:
         return self.__phone
 
     def str_full(self):
-        return "{}\n{}\n{}".format(self.get_fullname(), self.__address.str_full(), self.__phone())
+        return "{}\n{}".format(self.get_fullname(), self.__address.str_full())
 
 
 class Address:
