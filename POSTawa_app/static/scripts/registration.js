@@ -2,8 +2,15 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
     const GET = "GET";
     const POST = "POST";
-    const URL = "https://localhost:8081/";
+    const URL = "https://localhost:8080/";
 
+    const NAME_FIELD_ID = "name";
+    const SURNAME_FIELD_ID = "surname";
+    const BIRTH_DATE_FIELD_ID = "birthDate";
+    const STREET_FIELD_ID = "street";
+    const ADRESS_NUMBER_FIELD_ID = "adressNumber";
+    const POSTAL_CODE_FIELD_ID = "postalCode";
+    const COUNTRY_FIELD_ID = "country";
     const LOGIN_FIELD_ID = "login";
     const PESEL_FIELD_ID = "pesel";
     const PASSWORD_FIELD_ID = "password";
@@ -12,6 +19,13 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
     var HTTP_STATUS = {OK: 200, CREATED: 201, NOT_FOUND: 404};
 
+    prepareEventOnNameChange();
+    prepareEventOnSurnameChange();
+    prepareEventOnDateChange();
+    prepareEventOnStreetChange();
+    prepareEventOnAdressNumberChange();
+    prepareEventOnPostalCodeChange();
+    prepareEventOnCountryChange();
     prepareEventOnLoginChange();
     prepareEventOnPeselChange();
     prepareEventOnPasswordChange();
@@ -24,18 +38,47 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
         if(isFormOK()) {
             submitRegisterForm();
+            setTimeout(function(){
+                if (document.getElementById("correctRegister") !== null) {
+                    window.location = "/";
+                }
+            }, 2000);
         }
     });
 
     function isFormOK() {
-        let availabilityWarningElemId = document.getElementById("availableLoginWarning");
-        let validityWarningElemId = document.getElementById("validLoginWarning");
+        let emptyFieldWarningMessage = "Wszystkie pola są wymagane! Aby przejść dalej proszę wszystkie poprawnie wypełnić.";
+        let emptyFieldWaringElemId = "emptyWarning";
+        if(isAnyInputEmpty()) {
+            showWarningMessage(emptyFieldWaringElemId, emptyFieldWarningMessage, SUBMIT_BUTTON_ID);
+            return false;
+        } else {
+            removeWarningMessage(emptyFieldWaringElemId);
+        }
+        let nameWarningElemId = document.getElementById("nameWarning");
+        let surnameWarningElemId = document.getElementById("surnameWarning");
+        let birthDateYearWarningElemId = document.getElementById("yearWarning");
+        let streetWarningElemId = document.getElementById("streetWarning");
+        let adressNumberWarningElemId = document.getElementById("adressNumberWarning");
+        let postalCodeWarningElemId = document.getElementById("postalCodeWarning");
+        let countryWarningElemId = document.getElementById("countryWarning");
+        let loginAvailabilityWarningElemId = document.getElementById("availableLoginWarning");
+        let loginValidityWarningElemId = document.getElementById("validLoginWarning");
         let peselWaringElemId = document.getElementById("peselWaring");
         let passwordWarningElemId = document.getElementById("passwordWarning");
         let repeatPasswordWarningElemId = document.getElementById("repeatPasswordWarning");
 
-        if(availabilityWarningElemId === null &&
-            validityWarningElemId === null &&
+        
+
+        if( nameWarningElemId === null &&
+            surnameWarningElemId === null &&
+            birthDateYearWarningElemId === null &&
+            streetWarningElemId === null &&
+            adressNumberWarningElemId === null &&
+            postalCodeWarningElemId === null &&
+            countryWarningElemId === null &&
+            loginAvailabilityWarningElemId === null &&
+            loginValidityWarningElemId === null &&
             peselWaringElemId === null &&
             passwordWarningElemId === null &&
             repeatPasswordWarningElemId === null) {
@@ -43,6 +86,28 @@ document.addEventListener('DOMContentLoaded', function (event) {
         } else {
             return false;
         }
+    }
+
+    function isAnyInputEmpty() {
+        if (
+            document.getElementById(NAME_FIELD_ID).value === "" ||
+            document.getElementById(SURNAME_FIELD_ID).value === "" ||
+            document.getElementById(BIRTH_DATE_FIELD_ID).value === "" ||
+            document.getElementById(STREET_FIELD_ID).value === "" ||
+            document.getElementById(ADRESS_NUMBER_FIELD_ID).value === "" ||
+            document.getElementById(POSTAL_CODE_FIELD_ID).value === "" ||
+            document.getElementById(COUNTRY_FIELD_ID).value === "" ||
+            document.getElementById(LOGIN_FIELD_ID).value === "" ||
+            document.getElementById(PESEL_FIELD_ID).value === "" ||
+            document.getElementById(PASSWORD_FIELD_ID).value === "" ||
+            document.getElementById(REPEAT_PASSWORD_FIELD_ID).value === ""
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+        
+        
     }
 
     function prepareEventOnLoginChange() {
@@ -58,12 +123,49 @@ document.addEventListener('DOMContentLoaded', function (event) {
     function prepareEventOnPasswordChange() {
         let passwordInput = document.getElementById(PASSWORD_FIELD_ID);
         passwordInput.addEventListener("change", updatePasswordValidityMessage);
+        passwordInput.addEventListener("change", updateRepeatPasswordValidityMessage);
     }
 
     function prepareEventOnRepeatPasswordChange() {
         let repeatPasswordInput = document.getElementById(REPEAT_PASSWORD_FIELD_ID);
         repeatPasswordInput.addEventListener("change", updateRepeatPasswordValidityMessage);
     }
+
+    function prepareEventOnDateChange() {
+        let dateInput = document.getElementById(BIRTH_DATE_FIELD_ID);
+        dateInput.addEventListener("change", updateDateValidityMessage);
+    }
+
+    function prepareEventOnPostalCodeChange() {
+        let postalCode = document.getElementById(POSTAL_CODE_FIELD_ID);
+        postalCode.addEventListener("change", updatePostalCodeValidityMessage);
+    }
+
+    function prepareEventOnCountryChange() {
+        let country = document.getElementById(COUNTRY_FIELD_ID);
+        country.addEventListener("change", updateCountryValidityMessage);
+    }
+
+    function prepareEventOnNameChange() {
+        let name = document.getElementById(NAME_FIELD_ID);
+        name.addEventListener("change", updateNameValidityMessage);
+    }
+
+    function prepareEventOnSurnameChange() {
+        let surname = document.getElementById(SURNAME_FIELD_ID);
+        surname.addEventListener("change", updateSurnameValidityMessage);
+    }
+
+    function prepareEventOnStreetChange() {
+        let street = document.getElementById(STREET_FIELD_ID);
+        street.addEventListener("change", updateStreetValidityMessage);
+    }
+
+    function prepareEventOnAdressNumberChange() {
+        let adressNumber = document.getElementById(ADRESS_NUMBER_FIELD_ID);
+        adressNumber.addEventListener("change", updateAdressNumberValidityMessage);
+    }
+
 
     function updateLoginAvailabilityMessage() {
         let availabilityWarningElemId = "availableLoginWarning";
@@ -186,8 +288,8 @@ document.addEventListener('DOMContentLoaded', function (event) {
         let status = correctResponse.status;
         console.log("status " + status)
         let correctRegisterInfo = "correctRegister";
-        let sucessMessage = "Użytkownik został zarejestrowany pomyślnie.";
-        let warningRegisterInfo = "correctRegister";
+        let sucessMessage = "Użytkownik został zarejestrowany pomyślnie. Zaraz nastąpi przekierowanie.";
+        let warningRegisterInfo = "unsuccessfulRegister";
         let warningMessage = "Podczas rejstracji wystąpił błąd.";
 
         if (status !== HTTP_STATUS.CREATED) {
@@ -313,4 +415,103 @@ document.addEventListener('DOMContentLoaded', function (event) {
             return false;
         }
     }
+
+    function updateDateValidityMessage() {
+        let warningYearElemId = "yearWarning";
+        let warningYearMessage = "Podany rok nie jest prawidłowy. Musi zawierać się od 1900 do roku obecnego.";
+        let warningDateElemId = "dateWarning";
+
+        if (document.getElementById(BIRTH_DATE_FIELD_ID).value !== undefined){
+            removeWarningMessage(warningDateElemId);
+        }
+        let birthDate = new Date(document.getElementById(BIRTH_DATE_FIELD_ID).value);
+        year = birthDate.getFullYear();
+    
+        if (year > 1900 && year < new Date().getFullYear()) {
+            removeWarningMessage(warningYearElemId);
+        } else {
+            showWarningMessage(warningYearElemId, warningYearMessage, BIRTH_DATE_FIELD_ID);
+        }
+    }
+
+    function updatePostalCodeValidityMessage() {
+        let warningElemId = "postalCodeWarning";
+        let warningMessage = "Na razie akceptujemy tylko przesyłki narodowe. Kod musi mieć formę XX-XXX.";
+        let postalCode = document.getElementById(POSTAL_CODE_FIELD_ID).value;
+
+        regExpression = /^[0-9]{2}(?:-[0-9]{3})?$/;
+        
+        if (postalCode.match(regExpression)) {
+            removeWarningMessage(warningElemId);
+        } else {
+            showWarningMessage(warningElemId, warningMessage, POSTAL_CODE_FIELD_ID);
+        }
+    }
+
+    function updateCountryValidityMessage() {
+        let warningElemId = "countryWarning";
+        let warningMessage = "Na razie akceptujemy tylko przesyłki narodowe. To pole musi mieć wartość 'Poland' lub 'Polska'";
+        let country = document.getElementById(COUNTRY_FIELD_ID).value;
+
+        
+        if (country == "Polska" || country == "Poland") {
+            removeWarningMessage(warningElemId);
+        } else {
+            showWarningMessage(warningElemId, warningMessage, COUNTRY_FIELD_ID);
+        }
+    }
+
+    function updateNameValidityMessage() {
+        let warningElemId = "nameWarning";
+        let warningMessage = "To pole nie może być puste i musi składać się wyłącznie z liter.";
+        let name = document.getElementById(NAME_FIELD_ID).value;
+        let regExpression = /^[A-Za-ząćęłńóśźżĄĘŁŃÓŚŹŻ]+$/;
+
+        if (name.match(regExpression)) {
+            removeWarningMessage(warningElemId);
+        } else {
+            showWarningMessage(warningElemId, warningMessage, NAME_FIELD_ID);
+        }
+    }
+
+    function updateSurnameValidityMessage() {
+        let warningElemId = "surnameWarning";
+        let warningMessage = "To pole nie może być puste i musi składać się wyłącznie z liter.";
+        let surname = document.getElementById(SURNAME_FIELD_ID).value;
+        let regExpression = /^[A-Za-ząćęłńóśźżĄĘŁŃÓŚŹŻ]+$/;
+
+        if (surname.match(regExpression)) {
+            removeWarningMessage(warningElemId);
+        } else {
+            showWarningMessage(warningElemId, warningMessage, SURNAME_FIELD_ID);
+        }
+    }
+
+    function updateAdressNumberValidityMessage() {
+        let warningElemId = "adressNumberWarning";
+        let warningMessage = "To pole nie może być puste i musi składać się wyłącznie z cyfr.";
+        let adressNumber = document.getElementById(ADRESS_NUMBER_FIELD_ID).value;
+        let regExpression = /^[0-9]+$/;
+
+        if (adressNumber.match(regExpression)) {
+            removeWarningMessage(warningElemId);
+        } else {
+            showWarningMessage(warningElemId, warningMessage, ADRESS_NUMBER_FIELD_ID);
+        }
+    }
+
+    function updateStreetValidityMessage() {
+        let warningElemId = "streetWarning";
+        let warningMessage = "To pole nie może być puste.";
+        let street = document.getElementById(STREET_FIELD_ID).value;
+  
+
+        if (street.length > 0) {
+            removeWarningMessage(warningElemId);
+        } else {
+            showWarningMessage(warningElemId, warningMessage, STREET_FIELD_ID);
+        }
+    }
+
+
 });

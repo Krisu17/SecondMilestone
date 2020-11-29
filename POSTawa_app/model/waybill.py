@@ -1,19 +1,22 @@
 import uuid
-
 from fpdf import FPDF
+from datetime import datetime
 
 
 class Waybill:
 
-    def __init__(self, sender, recipient):
+    def __init__(self, sender, recipient, creation_date, package_id, waybill_image_path):
         self.__sender = sender
         self.__recipient = recipient
+        self.__creation_date = creation_date
+        self.__package_id = package_id
+        self.__waybill_image_path = waybill_image_path
 
     def generate_and_save(self, path="./"):
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=10)
-        filename = self.__generate_filename(path)
+        filename = "{}{}.pdf".format(path, self.__package_id)
         self.__add_table_to_pdf(pdf, filename)
 
         
@@ -37,18 +40,19 @@ class Waybill:
         pdf.ln(0)
         pdf.cell(col_width*2, n_lines * font_size, fn, border=1)
 
-    def __generate_filename(self, path):
-        unique_filename = uuid.uuid4().hex
+        if (self.__waybill_image_path is not ""):
+            fileExtension = self.__waybill_image_path.split('.')[-1]
+            pdf.image(name = self.__waybill_image_path, type = fileExtension, x = 15, y = 60, w = 50)
 
-        return "{}{}.pdf".format(path, unique_filename)
 
 
 class Person:
 
-    def __init__(self, name: str, surname: str, address):
+    def __init__(self, name: str, surname: str, address, phone_number: str):
         self.__name = name
         self.__surname = surname
         self.__address = address
+        self.__phone = phone
 
     def get_name(self):
         return self.__name
@@ -61,9 +65,12 @@ class Person:
 
     def get_address(self):
         return self.__address
+    
+    def get_phone(self):
+        return self.__phone
 
     def str_full(self):
-        return "{}\n{}".format(self.get_fullname(), self.__address.str_full())
+        return "{}\n{}\n{}".format(self.get_fullname(), self.__address.str_full(), self.__phone())
 
 
 class Address:

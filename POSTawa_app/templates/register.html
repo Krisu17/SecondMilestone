@@ -6,6 +6,7 @@
     <link href="styles/style.css" rel="stylesheet" type="text/css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
     <script src="scripts/registration.js"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 </head>
 <body class="registration_body">
 <nav>
@@ -15,11 +16,23 @@
     </div>
     <ul>
         <li><a href="/">Strona główna</a></li>
+        {% if isValidCookie %}
+        <li><a href="/add_waybill">Nadaj paczkę</a></li>
+        <li><a href="/show_waybills">Historia</a></li>
+        <li><a href="/contact">Kontakt</a></li>
+        <li><a href="/logout">Wyloguj się</a></li>
+        {% else %}
         <li><a href="/register">Zarejestuj się</a></li>
         <li><a href="/login">Zaloguj</a></li>
         <li><a href="/contact">Kontakt</a></li>
+        {% endif %}
     </ul>
 </nav>
+{% if isValidCookie %}
+<section>
+    <h2>Jesteś już zalogowany :) Aby zarejstrować nowego użytkownika, najpierw <a href="/logout">Wyloguj się</a></h2>
+</section>
+{% else %}
 <section>
 
     <h2>Zarejestruj się</h2>
@@ -77,7 +90,7 @@
     </form>
 
 </section>
-
+{% endif %}
 <footer>
     <p class="footer-inline left">&copy; 2020 Krzysztof Anderson</p>
     <p class="footer-inline right">proudly powered by <img src="images/notepad25.jpg" alt="notepad icon"/></p>

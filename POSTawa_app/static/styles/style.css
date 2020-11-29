@@ -175,9 +175,16 @@ footer {
 
 .form-row {
     margin-left: 30%;
+    margin-right: 30%;
     border: none;
     text-align: left;
     padding: 20px;
+}
+
+h1 {
+    color: #015431;
+    text-align: center;
+    font-size: 70px;
 }
 
 h2 {
@@ -192,4 +199,34 @@ h2 {
     color: rgba(0, 0, 0, 0.64);
     top: 40px;
     left: 0;
+}
+
+.name {
+    float: left;
+    margin-right: 20px;
+}
+
+.surname {
+    float: left;
+}
+
+.download {
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    background-color: #4CAF50;
+  }
+
+.download_table, .download_th, .download_td {
+    border: 1px solid darkgoldenrod;
+  }
+
+input, label {
+    display:block;
 }

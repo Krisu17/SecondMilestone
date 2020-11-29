@@ -3,3 +3,4 @@ redis
 pyopenssl
 flask-jwt-extended
 flask-cors
+fpdf
