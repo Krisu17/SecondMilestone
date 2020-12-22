@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
     const GET = "GET";
     const POST = "POST";
-    const URL = "https://localhost:8080/";
+    const URL = "https://localhost:8082/";
 
     const LOGIN_FIELD_ID = "login";
     const PASSWORD_FIELD_ID = "password";
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
     }
 
     const tryLogIn = async () => {
-        let loginUrl = URL + "login_user";
+        let loginUrl = URL + "login_kurier";
 
         let loginParams = {
             method: POST,
@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
 
     const ifFormOkTryLogIn = async() => {
-        
         
         
         let warningLoginInfoElemId = "unsuccessfulLogin";

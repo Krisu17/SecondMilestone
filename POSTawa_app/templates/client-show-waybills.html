@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <title>Historia paczek</title>
+    <meta charset="utf-8">
+    <link href="styles/style.css" rel="stylesheet" type="text/css">
+    <link href="http://fonts.googleapis.com/css?family=Cambay&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+    <script src="scripts/waybills.js"></script>
+</head>
+<body class="registration_body">
+    <nav>
+        <div class="logo">
+            <img class="logo_image" src="images/logo.png" alt="logo">
+            <h4 class="logo_title">Paczuch Express Delivery</h4>
+        </div>
+        <ul>
+            <li><a href="/">Strona główna</a></li>
+            {% if isValidCookie %}
+            <li><a href="/add_waybill">Nadaj paczkę</a></li>
+            <li><a href="/show_waybills_0">Historia</a></li>
+            <li><a href="/contact">Kontakt</a></li>
+            <li><a href="/logout">Wyloguj się</a></li>
+            {% else %}
+            <li><a href="/register">Zarejestuj się</a></li>
+            <li><a href="/login">Zaloguj</a></li>
+            <li><a href="/contact">Kontakt</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+<header>
+    <h2>Sprawdź historię swoich paczek!</h2>
+</header>
+<section>
+
+    
+
+    <table class="download_table">
+        {% for file in my_files %}
+        <tr id={{file}}>
+            <th class="download_th">{{ file }}</th>
+            <th class="download_th">
+                <div>
+                    <a href="https://localhost:8081/waybill/{{file}}" target="blank">
+                        <button class="download">Pobierz</button>
+                    </a>
+                </div>
+            </th>
+            <th class="download_th">
+                <div>
+                    <a target="blank" >
+                        <button class="remove" id={{file}} onclick="removeWaybill(id)">Usuń</button>
+                    </a>
+                </div>
+            </th>
+        </tr>
+        {% endfor %}
+        <tr>
+            <th>
+                {% if prev_start == None %}
+                {% else %}
+                <a href="https://localhost:8080/show_waybills_{{prev_start}}" >
+                    <button class="remove">Poprzednia</button>
+                </a>
+                {% endif %}
+            </th>
+            <th>
+                {% if next_start == None %}
+                {% else %}
+                <a href="https://localhost:8080/show_waybills_{{next_start}}">
+                    <button class="download">Następna</button>
+                </a>
+                {% endif %}
+            </th>
+        </tr>
+    </table>
+    
+</section>
+</body>
+</html>

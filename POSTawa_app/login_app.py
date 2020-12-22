@@ -9,14 +9,16 @@ import uuid
 import hashlib
 from datetime import datetime
 
+
 GET = "GET"
 POST = "POST"
-SESSION_ID = "session-id"
+USER_SESSION_ID = "user-session-id"
 users = "users"
 
 FILES_PATH = "waybill_files/"
 IMAGES_PATH = "waybill_files/images"
 ACCEPTED_IMAGE_EXTENSIONS = ["png", "jpeg", "jpg"]
+ITEMS_ON_PAGE = 5
 
 app = Flask(__name__, static_url_path="")
 db = redis.Redis(host="redis", port=6379, decode_responses=True)
@@ -35,7 +37,7 @@ cors = CORS(app)
 def index():
     user = getUserFromCookie();
     isValidCookie = user is not None
-    response = make_response(render_template("index.html", isValidCookie = isValidCookie))
+    response = make_response(render_template("client-index.html", isValidCookie = isValidCookie))
     return refresh_token_session(response, request.cookies);
     
 
@@ -43,14 +45,14 @@ def index():
 def register():
     user = getUserFromCookie();
     isValidCookie = user is not None
-    response = make_response(render_template("register.html", isValidCookie = isValidCookie))
+    response = make_response(render_template("client-register.html", isValidCookie = isValidCookie))
     return refresh_token_session(response, request.cookies);
 
 @app.route("/login", methods=[GET])
 def login():
     user = getUserFromCookie();
     isValidCookie = user is not None
-    response = make_response(render_template("login.html", isValidCookie = isValidCookie))
+    response = make_response(render_template("client-login.html", isValidCookie = isValidCookie))
     return refresh_token_session(response, request.cookies);
 
 @app.route("/add_waybill", methods=[GET])
@@ -58,7 +60,7 @@ def add_waybill():
     user = getUserFromCookie();
     isValidCookie = user is not None
     if isValidCookie:
-        response = make_response(render_template("add-waybill.html", isValidCookie = isValidCookie))
+        response = make_response(render_template("client-add-waybill.html", isValidCookie = isValidCookie))
         return refresh_token_session(response, request.cookies);
     else:
         return abort(401)
@@ -76,44 +78,77 @@ def add_waybill_new():
         db.hset(userWaybillList, package_id, addTime)
 
         db.hset(package_id, "sender_name", form.get("sender_name"));
-        db.hset(package_id, "sender_surname", form.get("sender_name"));
-        db.hset(package_id, "sender_street", form.get("sender_name"));
-        db.hset(package_id, "sender_city", form.get("sender_name"));
-        db.hset(package_id, "sender_postal", form.get("sender_name"));
-        db.hset(package_id, "sender_country", form.get("sender_name"));
-        db.hset(package_id, "sender_phone", form.get("sender_name"));
+        db.hset(package_id, "sender_surname", form.get("sender_surname"));
+        db.hset(package_id, "sender_street", form.get("sender_street"));
+        db.hset(package_id, "sender_city", form.get("sender_city"));
+        db.hset(package_id, "sender_postal", form.get("sender_postal"));
+        db.hset(package_id, "sender_country", form.get("sender_country"));
+        db.hset(package_id, "sender_phone", form.get("sender_phone"));
 
         db.hset(package_id, "recipient_name", form.get("recipient_name"));
-        db.hset(package_id, "recipient_surname", form.get("recipient_name"));
-        db.hset(package_id, "recipient_street", form.get("recipient_name"));
-        db.hset(package_id, "recipient_city", form.get("recipient_name"));
-        db.hset(package_id, "recipient_postal", form.get("recipient_name"));
-        db.hset(package_id, "recipient_country", form.get("recipient_name"));
-        db.hset(package_id, "recipient_phone", form.get("recipient_name"));
+        db.hset(package_id, "recipient_surname", form.get("recipient_surname"));
+        db.hset(package_id, "recipient_street", form.get("recipient_street"));
+        db.hset(package_id, "recipient_city", form.get("recipient_city"));
+        db.hset(package_id, "recipient_postal", form.get("recipient_postal"));
+        db.hset(package_id, "recipient_country", form.get("recipient_country"));
+        db.hset(package_id, "recipient_phone", form.get("recipient_phone"));
 
         db.hset(package_id, "creation_time", addTime)
+        db.hset(package_id, "status", "nowa")
 
         pathToImage = save_file(package_id, request.files["waybill_image"])
         db.hset(package_id, "waybill_image", pathToImage)
 
-        response = make_response(redirect("/show_waybills"))
+        response = make_response(redirect("/show_waybills_0"))
         return refresh_token_session(response, request.cookies);
     else:
-        return render_template("errors/401.html")
+        return make_response("Użytkownik niezalogowany", 401)
 
+@app.route("/waybill/rm/<string:waybill_hash>", methods=["DELETE"])
+def remove_waybill(waybill_hash):
+    login = getUserFromCookie();
+    isValidCookie = login is not None
+    if isValidCookie:
+        userWaybillList = login + "-waybills"
+        filePath = db.hget(waybill_hash, "waybill_image")
+        if(db.hget(waybill_hash, "status") != "nowa"):
+            return make_response("Paczka została już odebrana", 403)
+        if os.path.exists(filePath):
+            os.remove(filePath)
+        if(db.hdel(waybill_hash, "sender_name", "sender_surname", "sender_street", "sender_city", "sender_postal", "sender_country", "sender_phone", "recipient_name", "recipient_surname", "recipient_street", "recipient_city", "recipient_postal", "recipient_country", "recipient_phone", "creation_time", "status", "waybill_image") != 17):
+            return make_response("Podczas usuwania wystąpił błąd", 400)
+        if(db.hdel(userWaybillList, waybill_hash) != 1):
+            return make_response("Podczas usuwania wystąpił błąd", 400)
+        return make_response("Deleted", 200)
+    else:
+        return make_response("Użytkownik niezalogowany", 401)
 
-
-@app.route("/show_waybills", methods=[GET])
-def show_waybills():
+@app.route("/show_waybills_<int:start>", methods=[GET])
+def show_waybills(start):
     user = getUserFromCookie();
     isValidCookie = user is not None
     if isValidCookie:
         userWaybillList = user + "-waybills"
-        my_files = db.hgetall(userWaybillList);
-        response = make_response(render_template("show-waybills.html", isValidCookie = isValidCookie, my_files = my_files))
-        return refresh_token_session(response, request.cookies);
+        waybills = db.hgetall(userWaybillList);
+        waybills_list = list(waybills)
+        if (start >= 0):
+            number_of_waybills = len(waybills_list)
+            end = start + ITEMS_ON_PAGE
+            if (end >= number_of_waybills):
+                end = number_of_waybills
+                next_start = None
+            else:
+                next_start = end
+            prev_start = start - ITEMS_ON_PAGE
+            if (prev_start < 0):
+                prev_start = None
+            my_files = waybills_list[start:end]
+            response = make_response(render_template("client-show-waybills.html", isValidCookie = isValidCookie, my_files = my_files, prev_start = prev_start, next_start = next_start))
+            return refresh_token_session(response, request.cookies);
+        else:
+            abort(400)
     else:
-        return render_template("errors/401.html")
+        return abort(401)
 
 
 @app.route("/logout")
@@ -177,44 +212,35 @@ def log_user():
         userWaybillList = login + "-waybills"
         access_token = create_access_token(identity=login, user_claims=db.hgetall(userWaybillList));
         response = make_response(jsonify({"access_token": access_token}), 200)
-        response.set_cookie(SESSION_ID, name_hash, max_age=TOKEN_EXPIRES_IN_SECONDS, secure=True, httponly=True)
+        response.set_cookie(USER_SESSION_ID, name_hash, max_age=TOKEN_EXPIRES_IN_SECONDS, secure=True, httponly=True)
         return response
     else:
         return {"message": "Login or password incorrect."}, 400
 
 
 def refresh_token_session(response, cookies):
-    sessionId = cookies.get(SESSION_ID);
+    sessionId = cookies.get(USER_SESSION_ID);
     if (db.exists(str(sessionId))):
         db.expire(sessionId, TOKEN_EXPIRES_IN_SECONDS)
-        response.set_cookie(SESSION_ID, sessionId, max_age=TOKEN_EXPIRES_IN_SECONDS, secure=True, httponly=True)
+        response.set_cookie(USER_SESSION_ID, sessionId, max_age=TOKEN_EXPIRES_IN_SECONDS, secure=True, httponly=True)
     return response
-
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                          'favicon.ico',mimetype='image/vnd.microsoft.icon')
-
-@app.route('/<string:user>')
-def getUser(user):
-    return db.hgetall(user)
 
 
 def getUserFromCookie():
-    name_hash = request.cookies.get(SESSION_ID)
+    name_hash = request.cookies.get(USER_SESSION_ID)
     if name_hash is not None:
         login = db.get(name_hash);
         return login;
     return name_hash;
 
 def removeCookies():
-    sessionId = request.cookies.get(SESSION_ID)
+    sessionId = request.cookies.get(USER_SESSION_ID)
     if db.exists(sessionId):
         db.delete(sessionId);
         response = make_response(jsonify({"message": "OK"}), 200)
     else:
         response = make_response(jsonify({"message": "User is not logged"}), 204)
-    response.set_cookie(SESSION_ID, sessionId, max_age=0, secure=True, httponly=True)
+    response.set_cookie(USER_SESSION_ID, sessionId, max_age=0, secure=True, httponly=True)
     return response
 
 

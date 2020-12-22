@@ -18,5 +18,23 @@ services:
     environment:
       FLASK_ENV: development
       LOGIN_JWT_SECRET: $LOGIN_JWT_SECRET
+  kurier-app:
+    build:
+      context: .
+      dockerfile: ./Docker/kurier/Dockerfile
+    ports: ["8082:8882"]
+    volumes: [./POSTawa_app:/POSTawa_app]
+    environment:
+      FLASK_ENV: development
+      LOGIN_JWT_SECRET: $LOGIN_JWT_SECRET
+  paczkomat-app:
+    build:
+      context: .
+      dockerfile: ./Docker/paczkomat/Dockerfile
+    ports: ["8083:8883"]
+    volumes: [./POSTawa_app:/POSTawa_app]
+    environment:
+      FLASK_ENV: development
+      LOGIN_JWT_SECRET: $LOGIN_JWT_SECRET
   redis:
     image: "redis:alpine"
